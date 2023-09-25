@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 
 # constants
 HTML_PARSER = 'html.parser'
-TABLE_CLASS = 'pct_20_60_aunto'
+TABLE_CLASS = 'pct_40_auto'
 TABLE_ELEMENT = 'table'
 
 
