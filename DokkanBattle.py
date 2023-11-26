@@ -1,4 +1,5 @@
 import WebScraper
+import math
 
 # constants
 TD_ELEMENT = 'td'
@@ -22,8 +23,8 @@ def get_ranking_from_text(text):
         for ranking in table_data:
             if (isinstance(ranking, str) and
                 ranking.replace(STR_DOT, STR_EMPTY).isnumeric()
-                    and round(float(ranking)) > highest_ranking):
-                highest_ranking = round(float(ranking))
+                    and math.ceil(float(ranking)) > highest_ranking):
+                highest_ranking = math.ceil(float(ranking))
 
     return highest_ranking
 
