@@ -36,7 +36,7 @@ def main():
 
     ranking_list = []
     for site in sites_list:
-        html_text = WebScraper.get_tables(site)
+        html_text = WebScraper.get_tables_dokkan(site)
         ranking_list.append(get_ranking_from_text(html_text))
 
     for ranking in ranking_list:
