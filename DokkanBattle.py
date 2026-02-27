@@ -1,48 +1,46 @@
 import WebScraper
 import math
+from tqdm import tqdm
 
-# constants
 TD_ELEMENT = 'td'
 SPAN_ELEMENT = 'span'
 STR_DOT = '.'
 STR_EMPTY = ''
 SITE_PATH = './sites.txt'
 
-# get ranking for specific character from html text
 def get_ranking_from_text(text):
-    highest_ranking = 0
-
-    # Extract ranking and find highest ranking for given character
+    rankings = []
     for table in text:
-        table_data = []
         for row in table.find_all(TD_ELEMENT):
-            row_data = [cell.get_text(strip=True)
-                        for cell in row.find_all([SPAN_ELEMENT])]
-            if len(row_data) != 0:
-                table_data.append(row_data[0])
-        for ranking in table_data:
-            if (isinstance(ranking, str) and
-                ranking.replace(STR_DOT, STR_EMPTY).isnumeric()
-                    and math.ceil(float(ranking)) > highest_ranking):
-                highest_ranking = math.ceil(float(ranking))
+            for cell in row.find_all(SPAN_ELEMENT):
+                value = cell.get_text(strip=True)
+                if value.replace(STR_DOT, STR_EMPTY).isnumeric():
+                    rankings.append(math.ceil(float(value)))
+    return max(rankings, default=0)
 
-    return highest_ranking
-
-
-# main method to create and fill table
 def main():
-    sites = open(SITE_PATH, "r")
-    sites_list = sites.read().split('\n')
+    with open(SITE_PATH, "r") as f:
+        sites_list = [s for s in f.read().splitlines() if s.strip()]
 
+    total = len(sites_list)
+    update_interval = max(1, total // 20)  # every 5% (100% / 20 steps)
     ranking_list = []
-    for site in sites_list:
-        html_text = WebScraper.get_tables_dokkan(site)
-        ranking_list.append(get_ranking_from_text(html_text))
 
+    with tqdm(total=total, desc="Scraping sites", unit="site") as pbar:
+        for i, site in enumerate(sites_list):
+            try:
+                html_text = WebScraper.get_tables_dokkan(site)
+                ranking_list.append(get_ranking_from_text(html_text))
+            except Exception as e:
+                tqdm.write(f"Failed to scrape {site}: {e}")
+                ranking_list.append(0)
+
+            if (i + 1) % update_interval == 0 or (i + 1) == total:
+                pbar.update(update_interval if (i + 1) % update_interval == 0 else (i + 1) % update_interval)
+
+    print("\nResults:")
     for ranking in ranking_list:
         print(ranking)
 
-
-# run main method
 if __name__ == "__main__":
     main()
