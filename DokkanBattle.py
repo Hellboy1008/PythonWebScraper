@@ -7,13 +7,23 @@ SPAN_ELEMENT = 'span'
 STR_DOT = '.'
 STR_EMPTY = ''
 SITE_PATH = './sites.txt'
+ROW_VALUE_TO_READ = ['リーダー評価', 'サブ評価']
 
 def get_ranking_from_text(text):
     rankings = []
     for table in text:
+        countRow = False
         for row in table.find_all(TD_ELEMENT):
+            if (row.get_text(strip=True) in ROW_VALUE_TO_READ):
+                countRow = True
+                continue
+            if not countRow:
+                continue
+            countRow = False
+            print("rowTest" + row.get_text(strip=True))
             for cell in row.find_all(SPAN_ELEMENT):
                 value = cell.get_text(strip=True)
+                print("valueTest:" + cell.decode_contents())
                 if value.replace(STR_DOT, STR_EMPTY).isnumeric():
                     rankings.append(math.ceil(float(value)))
     return max(rankings, default=0)
