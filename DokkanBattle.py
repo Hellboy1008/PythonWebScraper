@@ -20,10 +20,8 @@ def get_ranking_from_text(text):
             if not countRow:
                 continue
             countRow = False
-            print("rowTest" + row.get_text(strip=True))
             for cell in row.find_all(SPAN_ELEMENT):
                 value = cell.get_text(strip=True)
-                print("valueTest:" + cell.decode_contents())
                 if value.replace(STR_DOT, STR_EMPTY).isnumeric():
                     rankings.append(math.ceil(float(value)))
     return max(rankings, default=0)
